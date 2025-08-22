@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    image: moodleng:latest
+    ports:
+      - "${HOST_PORT:-8080}:80"
+    restart: unless-stopped
+    env_file:
+      - .env

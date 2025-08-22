@@ -1,0 +1,8 @@
+node_modules
+npm-cache
+.angular
+coverage
+dist
+.git
+.gitignore
+*.log
