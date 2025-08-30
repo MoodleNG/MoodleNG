@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { navLinksSignal } from '../plugin-manager';
 import { ApiState } from '../api/state.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -17,6 +18,9 @@ import { AuthService } from '../auth/auth.service';
       }
       <nav class="links">
         <a routerLink="/profile" routerLinkActive="active">Profile</a>
+        @for (l of navLinks(); track l.route) {
+          <a [routerLink]="l.route" routerLinkActive="active">{{ l.label }}</a>
+        }
       </nav>
       <button class="logout" (click)="auth.logout()">Logout</button>
     </header>
@@ -33,4 +37,5 @@ import { AuthService } from '../auth/auth.service';
 export class NavbarComponent {
   store = inject(ApiState).data;
   auth = inject(AuthService);
+  navLinks = navLinksSignal;
 }
