@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../api/api.service';
@@ -7,7 +6,7 @@ import { ApiService } from '../../api/api.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="login-card">
       <h1>Sign in</h1>
@@ -16,8 +15,12 @@ import { ApiService } from '../../api/api.service';
         <input name="password" [(ngModel)]="password" placeholder="Password" type="password" required />
         <button type="submit" [disabled]="loading">{{ loading ? 'Signing in...' : 'Sign in' }}</button>
       </form>
-      <p class="error" *ngIf="error()">{{ error() }}</p>
-      <pre *ngIf="debug()">{{ debug() }}</pre>
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+      @if (debug()) {
+        <pre>{{ debug() }}</pre>
+      }
     </div>
   `,
   styles: [`
