@@ -1,15 +1,15 @@
-import { Component, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './navbar.component';
-import { AuthService } from '../auth/auth.service';
+import { ErrorBannerComponent } from './error-banner.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [CommonModule, RouterModule, NavbarComponent],
+  imports: [RouterModule, NavbarComponent, ErrorBannerComponent],
   template: `
-    <app-navbar (logout)="onLogout()"></app-navbar>
+    <app-navbar></app-navbar>
+    <app-error-banner></app-error-banner>
     <main class="container">
       <router-outlet></router-outlet>
     </main>
@@ -18,11 +18,4 @@ import { AuthService } from '../auth/auth.service';
     .container { padding: 16px; max-width: 1200px; margin: 0 auto; }
   `]
 })
-export class ShellComponent {
-  private auth = inject(AuthService);
-  user = computed(() => this.auth.user());
-
-  onLogout() {
-    this.auth.logout();
-  }
-}
+export class ShellComponent {}

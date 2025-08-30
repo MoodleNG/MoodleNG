@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, WritableSignal } from '@angular/core';
+import { Injectable, inject, signal, WritableSignal, effect } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../app.config';
@@ -11,11 +11,31 @@ export class ApiService {
 
   private store = new Map<EndpointKey, WritableSignal<any | null>>();
 
-  // Global error/debug signals for the last failed request
   readonly error = signal<string | null>(null);
   readonly debug = signal<string | null>(null);
 
-  /** Latest response for an endpoint as a signal. */
+  private readonly persistPrefix = 'api:';
+
+  constructor() {
+    const keys = Object.keys(endpoints) as EndpointKey[];
+
+    for (const key of keys) {
+      const s = this.state(key);
+      const saved = localStorage.getItem(this.persistPrefix + key);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (!s()) s.set(parsed);
+        } catch {}
+      }
+      effect(() => {
+        const val = s();
+        if (val !== null && val !== undefined) localStorage.setItem(this.persistPrefix + key, JSON.stringify(val));
+        else localStorage.removeItem(this.persistPrefix + key);
+      });
+    }
+  }
+
   state<K extends EndpointKey>(key: K): WritableSignal<any | null> {
     let s = this.store.get(key);
     if (!s) {
@@ -25,9 +45,7 @@ export class ApiService {
     return s;
   }
 
-  /** Perform a request using the endpoint registry. */
   async request<K extends EndpointKey>(key: K, payload?: EndpointParams<K>, pathSuffix: string = ''): Promise<any | null> {
-    // reset errors for this attempt
     this.error.set(null);
     this.debug.set(null);
 
@@ -73,11 +91,25 @@ export class ApiService {
     }
   }
 
-  /** Build HttpParams from a record. */
+  clear<K extends EndpointKey>(key: K): void {
+    const s = this.store.get(key);
+    if (s) s.set(null);
+    localStorage.removeItem(this.persistPrefix + key);
+  }
+
+  clearAll(): void {
+    for (const [key, s] of this.store.entries()) {
+      s.set(null);
+      localStorage.removeItem(this.persistPrefix + key);
+    }
+    this.error.set(null);
+    this.debug.set(null);
+  }
+
   #toParams(params?: Record<string, string | number | boolean>): HttpParams | undefined {
     if (!params) return undefined;
-    let hp = new HttpParams({ fromObject: {} });
-    for (const [k, v] of Object.entries(params)) hp = hp.append(k, String(v));
-    return hp;
+    const fromObject: Record<string, string> = {};
+    for (const [k, v] of Object.entries(params)) fromObject[k] = String(v);
+    return new HttpParams({ fromObject });
   }
 }
