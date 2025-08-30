@@ -13,6 +13,7 @@ export const guestOnlyGuard: CanActivateFn = (route) => {
   const auth = inject(AuthService);
   const router = inject(Router);
   if (!auth.isLoggedIn()) return true;
-  const redirect = route.queryParamMap.get('redirect') || '/';
+  const r = route.queryParamMap.get('redirect');
+  const redirect = r && r.startsWith('/') ? r : '/';
   return router.parseUrl(redirect);
 };

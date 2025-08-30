@@ -21,8 +21,8 @@ import { ApiState } from '../../api/state.service';
         <p><strong>Site URL:</strong> <a [href]="s?.siteurl" target="_blank" rel="noopener">{{ s?.siteurl }}</a></p>
         <p><strong>Release:</strong> {{ s?.release }}</p>
         <p><strong>Version:</strong> {{ s?.version }}</p>
-        <p><strong>Can manage own files:</strong> {{ s?.usercanmanageownfiles }}</p> <!-- define if user can use cloud storage maybe -->
-        <p><strong>User quota:</strong> {{ s?.userquota }}</p> <!-- user storage -->
+        <p><strong>Can manage own files:</strong> {{ s?.usercanmanageownfiles }}</p>
+        <p><strong>User quota:</strong> {{ s?.userquota }}</p>
         <p><strong>Max upload size:</strong> {{ s?.usermaxuploadfilesize }}</p>
         <p><strong>Site ID:</strong> {{ s?.siteid }}</p>
       </ng-container>

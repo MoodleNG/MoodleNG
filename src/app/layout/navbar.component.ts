@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ApiState } from '../api/state.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -18,7 +19,7 @@ import { ApiState } from '../api/state.service';
       <nav class="links">
         <a routerLink="/profile" routerLinkActive="active">Profile</a>
       </nav>
-      <button class="logout" (click)="logout.emit()">Logout</button>
+      <button class="logout" (click)="auth.logout()">Logout</button>
     </header>
   `,
   styles: [`
@@ -31,6 +32,6 @@ import { ApiState } from '../api/state.service';
   `]
 })
 export class NavbarComponent {
-  @Output() logout = new EventEmitter<void>();
   store = inject(ApiState).data;
+  auth = inject(AuthService);
 }

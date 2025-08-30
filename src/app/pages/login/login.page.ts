@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../api/api.service';
-import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -30,7 +29,6 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class LoginPage {
   private api = inject(ApiService);
-  private auth = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -47,12 +45,6 @@ export class LoginPage {
       const res = await this.api.request('auth', { username: this.username, password: this.password });
       const token = res?.token as string | undefined;
       if (!token) return;
-
-      // Store the raw responses by endpoint key for dynamic access
-      this.api.state('auth').set(res);
-
-      const site = await this.api.request('core_webservice_get_site_info', { wstoken: token });
-      this.api.state('core_webservice_get_site_info').set(site);
 
       const queryRedirect = this.route.snapshot.queryParamMap.get('redirect');
       const target = queryRedirect && queryRedirect.startsWith('/') ? queryRedirect : '/';
