@@ -1,19 +1,22 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ApiService } from '../api/api.service';
 
 @Component({
   selector: 'app-error-banner',
   standalone: true,
-  imports: [CommonModule],
   template: `
-    <div *ngIf="api.error() as err" class="err">
-      <div class="row">
-        <span class="title">{{ err }}</span>
-        <button class="btn" (click)="show = !show">{{ show ? 'Hide' : 'Details' }}</button>
+    @let err = api.error();
+    @if (err) {
+      <div class="err">
+        <div class="row">
+          <span class="title">{{ err }}</span>
+          <button class="btn" (click)="show = !show">{{ show ? 'Hide' : 'Details' }}</button>
+        </div>
+        @if (show && api.debug()) {
+          <pre class="debug">{{ api.debug() }}</pre>
+        }
       </div>
-      <pre *ngIf="show && api.debug()" class="debug">{{ api.debug() }}</pre>
-    </div>
+    }
   `,
   styles: [`
     .err { background: #fef2f2; color: #7f1d1d; border: 1px solid #fecaca; padding: 10px 12px; border-radius: 8px; margin: 12px 16px; }

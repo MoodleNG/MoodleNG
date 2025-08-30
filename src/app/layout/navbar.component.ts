@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ApiState } from '../api/state.service';
 import { AuthService } from '../auth/auth.service';
@@ -7,15 +6,15 @@ import { AuthService } from '../auth/auth.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   template: `
     <header class="nav">
-      <ng-container *ngIf="store.core_webservice_get_site_info as s; else brand">
+      @let s = store.core_webservice_get_site_info;
+      @if (s) {
         <a routerLink="/" class="brand">{{ s?.sitename || 'MoodleNG' }}</a>
-      </ng-container>
-      <ng-template #brand>
+      } @else {
         <a routerLink="/" class="brand">MoodleNG</a>
-      </ng-template>
+      }
       <nav class="links">
         <a routerLink="/profile" routerLinkActive="active">Profile</a>
       </nav>
