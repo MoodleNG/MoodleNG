@@ -1,0 +1,64 @@
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ApiService } from '../../api/api.service';
+import { AuthService } from '../../auth/auth.service';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="login-card">
+      <h1>Sign in</h1>
+      <form (ngSubmit)="login()" #f="ngForm">
+        <input name="username" [(ngModel)]="username" placeholder="Username" required />
+        <input name="password" [(ngModel)]="password" placeholder="Password" type="password" required />
+        <button type="submit" [disabled]="loading">{{ loading ? 'Signing in...' : 'Sign in' }}</button>
+      </form>
+      <p class="error" *ngIf="error()">{{ error() }}</p>
+      <pre *ngIf="debug()">{{ debug() }}</pre>
+    </div>
+  `,
+  styles: [`
+    .login-card { max-width: 400px; margin: 80px auto; padding: 24px; border:1px solid #e5e7eb; border-radius: 12px; }
+    input { display:block; width:100%; margin: 8px 0; padding: 8px 10px; }
+    button { margin-top: 8px; width: 100%; padding: 10px; }
+    .error { color: #dc2626; white-space: pre-wrap; }
+  `]
+})
+export class LoginPage {
+  private api = inject(ApiService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  username = '';
+  password = '';
+  loading = false;
+
+  get error() { return this.api.error; }
+  get debug() { return this.api.debug; }
+
+  async login() {
+    this.loading = true;
+    try {
+      const res = await this.api.request('auth', { username: this.username, password: this.password });
+      const token = res?.token as string | undefined;
+      if (!token) return;
+
+      // Store the raw responses by endpoint key for dynamic access
+      this.api.state('auth').set(res);
+
+      const site = await this.api.request('core_webservice_get_site_info', { wstoken: token });
+      this.api.state('core_webservice_get_site_info').set(site);
+
+      const queryRedirect = this.route.snapshot.queryParamMap.get('redirect');
+      const target = queryRedirect && queryRedirect.startsWith('/') ? queryRedirect : '/';
+      await this.router.navigateByUrl(target, { replaceUrl: true });
+    } finally {
+      this.loading = false;
+    }
+  }
+}
