@@ -4,6 +4,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 
 import { routes } from './app.routes';
 import { authInterceptorFn } from './api/models';
+import { providePlugins } from './plugin-manager';
 
 declare global {
   interface Window { __APP_CONFIG__?: { API_BASE_URL?: string } }
@@ -14,7 +15,8 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptorFn]))
+    provideHttpClient(withFetch(), withInterceptors([authInterceptorFn])),
+    providePlugins()
   ]
 };
 
